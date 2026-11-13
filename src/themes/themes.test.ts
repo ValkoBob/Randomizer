@@ -18,6 +18,21 @@ describe('THEMES', () => {
       expect(theme.confetti.colors.length).toBeGreaterThan(0);
     }
   });
+
+  it('describe each elimination with all three labels', () => {
+    for (const theme of THEMES) {
+      if (!theme.elimination) continue;
+      const { startLabel, outLabel, lastLabel } = theme.elimination;
+      for (const label of [startLabel, outLabel, lastLabel]) expect(label.trim(), theme.id).not.toBe('');
+      expect(outLabel, theme.id).toContain('{name}');
+    }
+  });
+
+  it('give New Year, Mafia, Wild West and Ukrainian their own elimination scene', () => {
+    const kinds = Object.fromEntries(THEMES.map((t) => [t.id, t.elimination?.kind]));
+    expect(kinds).toMatchObject({ newyear: 'tree', mafia: 'shooting', wildwest: 'race', ukrainian: 'hopak' });
+    expect(kinds.halloween).toBeUndefined();
+  });
 });
 
 describe('getTheme', () => {

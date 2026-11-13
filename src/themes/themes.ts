@@ -6,6 +6,19 @@ export type LabelledPhase = 'flipDown' | 'gather' | 'shuffle' | 'deal' | 'scan' 
 /** Extra animation layered over the deck while it is being shuffled. */
 export type ShuffleFxKind = 'smoke' | 'tumbleweed' | 'hopak';
 
+/** Scene that knocks participants out one by one after the shuffle; the last one standing wins. */
+export type EliminationKind = 'tree' | 'shooting' | 'race' | 'hopak';
+
+export type Elimination = {
+  kind: EliminationKind;
+  /** Status while the scene starts. */
+  startLabel: string;
+  /** Status after someone is out; `{name}` is replaced with their name. */
+  outLabel: string;
+  /** Status once only the winner is left. */
+  lastLabel: string;
+};
+
 export type Theme = {
   id: ThemeId;
   /** Name in the theme menu. */
@@ -23,6 +36,8 @@ export type Theme = {
   phaseLabels: Record<LabelledPhase, string>;
   confetti: { colors: string[]; emojis?: string[] };
   shuffleFx?: ShuffleFxKind;
+  /** Without it the round ends with the cards dealt out and a highlight running over them. */
+  elimination?: Elimination;
 };
 
 export const THEMES: Theme[] = [
@@ -58,7 +73,7 @@ export const THEMES: Theme[] = [
     emptyIcon: '🕵️',
     shuffleButton: '🃏 Роздати ролі',
     againButton: '🌙 Наступна ніч',
-    winnerHeading: '🔫 Вибір зроблено!',
+    winnerHeading: '🕵️ Хто вижив — той і переміг!',
     allWonText: 'Ролі отримали всі — місто порожнє 🌆',
     phaseLabels: {
       flipDown: 'Місто засинає…',
@@ -70,6 +85,12 @@ export const THEMES: Theme[] = [
     },
     confetti: { colors: ['#c0141e', '#e8c26a', '#f3ead8', '#1a1a1a'], emojis: ['🃏', '♠️', '🌹'] },
     shuffleFx: 'smoke',
+    elimination: {
+      kind: 'shooting',
+      startLabel: 'Мафія заряджає револьвер…',
+      outLabel: '🔫 Постріл! Вибуває {name}',
+      lastLabel: 'Набої скінчились — хтось таки вижив!',
+    },
   },
   {
     id: 'newyear',
@@ -92,6 +113,12 @@ export const THEMES: Theme[] = [
       reveal: 'Ось він!',
     },
     confetti: { colors: ['#e0303a', '#1f8a4c', '#f5c542', '#ffffff'], emojis: ['❄️', '⭐', '🎁'] },
+    elimination: {
+      kind: 'tree',
+      startLabel: 'Санта трохи перебрав і вчепився в ялинку…',
+      outLabel: '💥 Дзень! Впала іграшка «{name}»',
+      lastLabel: 'Остання іграшка вистояла! 🎄',
+    },
   },
   {
     id: 'medieval',
@@ -137,6 +164,12 @@ export const THEMES: Theme[] = [
     },
     confetti: { colors: ['#c8742f', '#e9c27a', '#7a4a24', '#f4e2b8'], emojis: ['⭐', '💰', '🌵'] },
     shuffleFx: 'tumbleweed',
+    elimination: {
+      kind: 'race',
+      startLabel: 'На старт! Коні рвуться в прерію… 🐎',
+      outLabel: '💨 Кінь спіткнувся — вибуває {name}',
+      lastLabel: 'Фініш! 🏁',
+    },
   },
   {
     id: 'ukrainian',
@@ -160,6 +193,12 @@ export const THEMES: Theme[] = [
     },
     confetti: { colors: ['#0057b7', '#ffd700', '#c8102e', '#ffffff'], emojis: ['🌻', '💙', '💛'] },
     shuffleFx: 'hopak',
+    elimination: {
+      kind: 'hopak',
+      startLabel: 'Гопак! Хто дотанцює до кінця?',
+      outLabel: '😵 Вибивається з сил: {name}',
+      lastLabel: 'Хтось таки дотанцював! 🌻',
+    },
   },
 ];
 
