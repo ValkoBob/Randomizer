@@ -1,5 +1,7 @@
 import { motion, type MotionStyle, type TargetAndTransition, type Transition } from 'motion/react';
 import type { Participant } from '../participants/types';
+import { useTheme } from '../themes/ThemeContext';
+import { Monogram } from './Monogram';
 
 type CardProps = {
   participant: Participant;
@@ -12,10 +14,11 @@ type CardProps = {
 };
 
 /**
- * Two-sided card: front = photo + owner's name, back = Halloween pattern.
+ * Two-sided card: front = photo (or initials in the names-only mode) + owner's name, back = the current theme's pattern.
  * The shared layoutId lets the same card fly between the table, the deck and the winner overlay.
  */
 export function Card({ participant, faceDown = false, flipDelay = 0, className = '', style, animate, transition }: CardProps) {
+  const theme = useTheme();
   return (
     <motion.div
       layout
@@ -33,11 +36,15 @@ export function Card({ participant, faceDown = false, flipDelay = 0, className =
         transition={{ duration: 0.55, delay: flipDelay, ease: 'easeInOut' }}
       >
         <div className="card-face card-front">
-          <img src={participant.src} alt={participant.name} draggable={false} />
+          {participant.src ? (
+            <img src={participant.src} alt={participant.name} draggable={false} />
+          ) : (
+            <Monogram name={participant.name} className="card-monogram" />
+          )}
           <div className="card-name">{participant.name}</div>
         </div>
         <div className="card-face card-back" aria-hidden="true">
-          <span className="card-back-pumpkin">🎃</span>
+          <span className="card-back-icon">{theme.cardBackIcon}</span>
         </div>
       </motion.div>
     </motion.div>

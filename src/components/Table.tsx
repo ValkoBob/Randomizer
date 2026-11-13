@@ -1,27 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { AnimatePresence, useReducedMotion, type TargetAndTransition, type Transition } from 'motion/react';
 import type { Participant } from '../participants/types';
-import { buildScanSchedule, interleave, randomInt, riffleCut } from '../random';
+import { ELIMINATION_FINALE_MS, ELIMINATION_INTRO_MS, eliminationStepMs } from '../elimination';
+import { buildScanSchedule, interleave, randomInt, riffleCut, shuffle } from '../random';
+import { useTheme } from '../themes/ThemeContext';
+import type { LabelledPhase } from '../themes/themes';
 import { Card } from './Card';
+import { EliminationStage } from './elimination/EliminationStage';
+import { ShuffleFx } from './ShuffleFx';
 import { WinnerOverlay } from './WinnerOverlay';
 
-type Phase = 'idle' | 'flipDown' | 'gather' | 'shuffle' | 'deal' | 'scan' | 'reveal' | 'result';
-
-const PHASE_LABELS: Partial<Record<Phase, string>> = {
-  flipDown: 'Перевертаємо картки…',
-  gather: 'Збираємо колоду…',
-  shuffle: 'Тасуємо…',
-  deal: 'Роздаємо…',
-  scan: 'Хто ж це буде?..',
-  reveal: 'Є!',
-};
+type Phase = 'idle' | LabelledPhase | 'eliminate' | 'result';
 
 const SHUFFLE_PASSES = 3;
 const EASE: [number, number, number, number] = [0.3, 0.7, 0.2, 1];
 
 class RoundCancelled extends Error {}
-
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /** Grid columns: as few rows as possible with at most 6 cards per row, balanced (8 → 4×2). */
 function columnsFor(count: number): number {
@@ -41,6 +35,7 @@ type TableProps = {
 };
 
 export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinners }: TableProps) {
+  const theme = useTheme();
   const [phase, setPhase] = useState<Phase>('idle');
   const [order, setOrder] = useState<string[]>(() => pool.map((p) => p.id));
   const [faceDown, setFaceDown] = useState(false);
@@ -49,9 +44,16 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [deckSize, setDeckSize] = useState<DeckSize | null>(null);
   const [autoStart, setAutoStart] = useState(false);
+  // Elimination scenes: who is already out (in order), who is about to go, and the pace.
+  const [out, setOut] = useState<string[]>([]);
+  const [target, setTarget] = useState<string | null>(null);
+  const [eliminationDone, setEliminationDone] = useState(false);
+  const [stepMs, setStepMs] = useState(1000);
 
   const tableRef = useRef<HTMLDivElement>(null);
   const alive = useRef(true);
+  const running = useRef(false);
+  const roundController = useRef<AbortController | null>(null);
   const reducedMotion = useReducedMotion() ?? false;
   const speed = reducedMotion ? 0.35 : 1;
 
@@ -66,13 +68,14 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
   );
 
   // The async round reads the latest values through refs, so it can stay a stable callback.
-  const latest = useRef({ cards, speed });
-  latest.current = { cards, speed };
+  const latest = useRef({ cards, speed, elimination: theme.elimination });
+  latest.current = { cards, speed, elimination: theme.elimination };
 
   useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
+      roundController.current?.abort();
     };
   }, []);
 
@@ -91,12 +94,25 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
   }, [pool, phase]);
 
   const runRound = useCallback(async () => {
+    const controller = new AbortController();
+    roundController.current = controller;
+    const { cards: roundCards, speed: roundSpeed, elimination } = latest.current;
     const wait = async (ms: number) => {
-      await sleep(ms * latest.current.speed);
-      if (!alive.current) throw new RoundCancelled();
+      await new Promise<void>((resolve, reject) => {
+        const cancel = () => {
+          clearTimeout(timer);
+          reject(new RoundCancelled());
+        };
+        const timer = setTimeout(() => {
+          controller.signal.removeEventListener('abort', cancel);
+          resolve();
+        }, ms * roundSpeed);
+        controller.signal.addEventListener('abort', cancel, { once: true });
+      });
+      if (!alive.current || controller.signal.aborted) throw new RoundCancelled();
     };
 
-    const ids = latest.current.cards.map((p) => p.id);
+    const ids = roundCards.map((p) => p.id);
     if (ids.length === 0) return;
     // The winner is decided up front with crypto randomness; the animation just lands on it.
     const winner = ids[randomInt(ids.length)];
@@ -131,6 +147,26 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
       await wait(550);
     }
 
+    if (elimination) {
+      // Everyone but the winner is knocked out one by one, in random order; the last one standing wins.
+      const losers = shuffle(current.filter((id) => id !== winner));
+      const step = eliminationStepMs(losers.length);
+      setStepMs(step * roundSpeed);
+      setPhase('eliminate');
+      await wait(ELIMINATION_INTRO_MS);
+      for (const id of losers) {
+        setTarget(id);
+        await wait(step * 0.45);
+        setOut((prev) => [...prev, id]);
+        setTarget(null);
+        await wait(step * 0.55);
+      }
+      setEliminationDone(true);
+      await wait(ELIMINATION_FINALE_MS);
+      setPhase('result');
+      return;
+    }
+
     setPhase('deal');
     await wait(800 + current.length * 60);
 
@@ -146,13 +182,31 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
   }, []);
 
   const startRound = useCallback(() => {
+    // The ref locks synchronously, before React has disabled the button.
+    if (running.current || latest.current.cards.length === 0) return;
+    running.current = true;
     runRound().catch((error: Error) => {
-      if (!(error instanceof RoundCancelled)) console.error('Round failed', error);
+      running.current = false;
+      if (!(error instanceof RoundCancelled)) {
+        console.error('Round failed', error);
+        if (alive.current) {
+          setPhase('idle');
+          setFaceDown(false);
+          setWinnerId(null);
+          setSplitLeft(null);
+          setDeckSize(null);
+          setOut([]);
+          setTarget(null);
+          setEliminationDone(false);
+        }
+      }
     });
   }, [runRound]);
 
   const finishRound = useCallback(
     (again: boolean) => {
+      if (!running.current) return;
+      running.current = false;
       const winner = winnerId ? byId.get(winnerId) : undefined;
       setPhase('idle');
       setFaceDown(false);
@@ -160,6 +214,9 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
       setWinnerId(null);
       setDeckSize(null);
       setSplitLeft(null);
+      setOut([]);
+      setTarget(null);
+      setEliminationDone(false);
       if (winner) onRoundEnd(winner);
       if (again) setAutoStart(true);
     },
@@ -178,7 +235,19 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
 
   const isDeck = phase === 'gather' || phase === 'shuffle';
   const winner = winnerId ? byId.get(winnerId) : undefined;
-  const status = PHASE_LABELS[phase];
+  const showScene = Boolean(theme.elimination) && (phase === 'eliminate' || (phase === 'result' && out.length > 0));
+
+  function eliminationStatus(): string {
+    const labels = theme.elimination;
+    if (!labels) return '';
+    if (eliminationDone) return labels.lastLabel;
+    const last = out.length > 0 ? byId.get(out[out.length - 1]) : undefined;
+    if (!last) return labels.startLabel;
+    return `${labels.outLabel.replace('{name}', last.name)} · у грі: ${cards.length - out.length}`;
+  }
+
+  const status =
+    phase === 'idle' || phase === 'result' ? undefined : phase === 'eliminate' ? eliminationStatus() : theme.phaseLabels[phase];
 
   const tableStyle = {
     '--cols': columnsFor(cards.length),
@@ -228,14 +297,14 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
   return (
     <section className="stage">
       <div className="controls">
-        <button type="button" className="btn-primary" onClick={startRound} disabled={phase !== 'idle' || cards.length === 0}>
-          🎃 Тасувати!
+        <button type="button" className="btn-primary" onClick={startRound} disabled={phase !== 'idle' || autoStart || cards.length === 0}>
+          {theme.shuffleButton}
         </button>
         <div className="status" aria-live="polite">
           {status ??
             (cards.length === 0
               ? allExcluded
-                ? 'Усі вже виграли 🎉'
+                ? theme.allWonText
                 : 'Додайте учасників, щоб почати'
               : `${cards.length} у грі`)}
           {phase === 'idle' && allExcluded && (
@@ -246,26 +315,39 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
         </div>
       </div>
 
-      <div ref={tableRef} className={`table ${isDeck ? 'is-deck' : ''}`} style={tableStyle}>
-        {cards.map((participant, index) => {
-          if (phase === 'result' && participant.id === winnerId) {
-            return <div key={participant.id} className="card-slot" />;
-          }
-          const { animate, transition, className, zIndex } = cardMotion(participant.id, index);
-          return (
-            <Card
-              key={participant.id}
-              participant={participant}
-              faceDown={faceDown && !(participant.id === winnerId && (phase === 'reveal' || phase === 'result'))}
-              flipDelay={phase === 'flipDown' ? index * 0.06 * speed : 0}
-              className={className}
-              style={{ zIndex }}
-              animate={animate}
-              transition={transition}
-            />
-          );
-        })}
-      </div>
+      {showScene && theme.elimination ? (
+        <EliminationStage
+          kind={theme.elimination.kind}
+          participants={cards}
+          out={out}
+          target={target}
+          winnerId={winnerId}
+          done={eliminationDone}
+          stepMs={stepMs}
+        />
+      ) : (
+        <div ref={tableRef} className={`table ${isDeck ? 'is-deck' : ''}`} style={tableStyle}>
+          {cards.map((participant, index) => {
+            if (phase === 'result' && participant.id === winnerId) {
+              return <div key={participant.id} className="card-slot" />;
+            }
+            const { animate, transition, className, zIndex } = cardMotion(participant.id, index);
+            return (
+              <Card
+                key={participant.id}
+                participant={participant}
+                faceDown={faceDown && !(participant.id === winnerId && (phase === 'reveal' || phase === 'result'))}
+                flipDelay={phase === 'flipDown' ? index * 0.06 * speed : 0}
+                className={className}
+                style={{ zIndex }}
+                animate={animate}
+                transition={transition}
+              />
+            );
+          })}
+          <AnimatePresence>{isDeck && theme.shuffleFx && !reducedMotion && <ShuffleFx key="fx" kind={theme.shuffleFx} />}</AnimatePresence>
+        </div>
+      )}
 
       <AnimatePresence>
         {phase === 'result' && winner && <WinnerOverlay key={winner.id} winner={winner} onClose={finishRound} />}

@@ -1,0 +1,1277 @@
+/* ───────────── Сцени «на вибування» (src/components/elimination) ───────────── */
+
+.scene {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  animation: scene-in 0.5s ease-out both;
+  min-width: 0;
+}
+
+@keyframes scene-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.scene-race,
+.scene-shooting,
+.scene-hopak {
+  max-height: 65vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-y: contain;
+}
+
+.scene-race { overflow: clip; }
+
+.avatar {
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+  background: #111;
+}
+
+.avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar .monogram {
+  width: 100%;
+  height: 100%;
+  font-size: 40cqmin;
+}
+
+/* ───────── Новий рік: п'яний Санта трясе ялинку ───────── */
+
+.tree-stage {
+  position: relative;
+  width: min(100%, 640px, 66vh);
+  aspect-ratio: 1.15;
+}
+
+.tree-stage::after {
+  content: '';
+  position: absolute;
+  inset: auto -4% 0;
+  height: 5%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.9), rgba(220, 235, 255, 0.55) 60%, transparent 75%);
+  z-index: 0;
+}
+
+.tree-area {
+  position: absolute;
+  left: 27.5%;
+  top: 0;
+  width: 72.5%;
+  height: 100%;
+  container-type: inline-size;
+  z-index: 1;
+}
+
+.tree-sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 92%;
+  animation: tree-idle 3s ease-in-out infinite alternate;
+}
+
+.tree-sway.is-shaking {
+  animation: tree-shake 0.16s ease-in-out infinite alternate;
+}
+
+@keyframes tree-idle {
+  from {
+    transform: rotate(-0.6deg);
+  }
+  to {
+    transform: rotate(0.6deg);
+  }
+}
+
+@keyframes tree-shake {
+  from {
+    transform: rotate(-3deg) translateX(-1.2%);
+  }
+  to {
+    transform: rotate(2.5deg) translateX(1%);
+  }
+}
+
+.tree-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
+}
+
+.tree-lights circle {
+  animation: tree-light 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes tree-light {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tree-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tree-star 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 213, 74, 0.9));
+}
+
+@keyframes tree-star {
+  50% {
+    transform: scale(1.12) rotate(8deg);
+  }
+}
+
+.ornament {
+  position: absolute;
+  aspect-ratio: 1;
+  z-index: 1;
+  transform-origin: 50% -40%;
+  animation: ornament-swing 2.6s ease-in-out var(--lag) infinite alternate;
+}
+
+/* The thread it hangs on and the cap */
+.ornament::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1px;
+  height: 30%;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.ornament-cap {
+  position: absolute;
+  left: 36%;
+  top: -9%;
+  width: 28%;
+  height: 14%;
+  border-radius: 3px 3px 1px 1px;
+  background: linear-gradient(90deg, #a77b10, #ffe08a, #a77b10);
+  z-index: 2;
+}
+
+.ornament-ball {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: max(2px, 0.6cqw) solid var(--ring);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+.ornament-gloss {
+  position: absolute;
+  left: 18%;
+  top: 14%;
+  width: 30%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.75), transparent 70%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ornament-name {
+  position: absolute;
+  left: 50%;
+  top: 102%;
+  transform: translateX(-50%);
+  max-width: 220%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: clamp(9px, 2.5cqw, 14px);
+  font-weight: 700;
+  line-height: 1.3;
+  z-index: 3;
+}
+
+@keyframes ornament-swing {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+.tree-sway.is-shaking .ornament {
+  animation-duration: 0.3s;
+}
+
+.ornament.is-target {
+  z-index: 4;
+  animation: ornament-rattle 0.11s ease-in-out infinite alternate;
+}
+
+.ornament.is-target .ornament-ball {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 18px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes ornament-rattle {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+.ornament.is-winner {
+  z-index: 5;
+  animation: ornament-swing 1.2s ease-in-out infinite alternate;
+}
+
+.ornament.is-winner .ornament-ball {
+  animation: winner-glow 1s ease-in-out infinite alternate;
+}
+
+.ornament.is-winner::after {
+  content: '🎁';
+  position: absolute;
+  left: 75%;
+  top: -45%;
+  font-size: clamp(20px, 8cqw, 38px);
+  filter: drop-shadow(0 3px 5px #0006);
+  animation: gift-arrive 0.65s cubic-bezier(0.2, 1.4, 0.5, 1) both;
+}
+
+@keyframes gift-arrive {
+  from { opacity: 0; transform: translateY(-35px) rotate(-18deg) scale(0.2); }
+  to { opacity: 1; transform: translateY(0) rotate(8deg) scale(1); }
+}
+
+@keyframes winner-glow {
+  from {
+    box-shadow:
+      0 0 0 3px #ffd54a,
+      0 0 14px rgba(255, 213, 74, 0.6);
+  }
+  to {
+    box-shadow:
+      0 0 0 4px #fff3b0,
+      0 0 34px rgba(255, 213, 74, 1);
+  }
+}
+
+/* Fallen: drops to the floor in an arc (sideways drift + accelerating fall) and spins. */
+.ornament.is-fallen {
+  z-index: 2;
+  left: var(--x1);
+  top: var(--y1);
+  transform: rotate(var(--spin));
+  transform-origin: 50% 50%;
+  animation:
+    fall-x var(--fall) ease-out both,
+    fall-y var(--fall) cubic-bezier(0.55, 0, 1, 0.45) both,
+    fall-spin var(--fall) linear both;
+}
+
+@keyframes fall-x {
+  from {
+    left: var(--x0);
+  }
+  to {
+    left: var(--x1);
+  }
+}
+
+@keyframes fall-y {
+  from {
+    top: var(--y0);
+  }
+  to {
+    top: var(--y1);
+  }
+}
+
+@keyframes fall-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--spin));
+  }
+}
+
+.ornament.is-fallen::before {
+  display: none;
+}
+
+.ornament.is-fallen .ornament-ball {
+  animation: ornament-break 0.3s ease-out var(--fall) forwards;
+}
+
+@keyframes ornament-break {
+  to {
+    filter: grayscale(0.85) brightness(0.6);
+    opacity: 0.75;
+  }
+}
+
+.ornament-crack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 4;
+  stroke-linejoin: round;
+  opacity: 0;
+  z-index: 2;
+  animation: fade-in 0.15s ease-out var(--fall) forwards;
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.ornament-shard {
+  position: absolute;
+  left: 44%;
+  top: 80%;
+  width: 14%;
+  height: 14%;
+  background: var(--ring);
+  clip-path: polygon(50% 0, 100% 100%, 0 80%);
+  opacity: 0;
+  z-index: 3;
+  animation: shard-fly 0.55s ease-out var(--fall) forwards;
+}
+
+@keyframes shard-fly {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-260%) rotate(160deg);
+  }
+}
+
+/* Santa */
+
+.santa {
+  position: absolute;
+  left: 0;
+  bottom: 2%;
+  width: 35%;
+  z-index: 2;
+}
+
+.santa-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.35));
+}
+
+.santa-svg g {
+  transform-box: view-box;
+}
+
+.santa-body {
+  transform-origin: 66px 196px;
+  animation: santa-sway 2.4s ease-in-out infinite alternate;
+}
+
+.santa-head {
+  transform-origin: 72px 74px;
+  animation: santa-head 3.1s ease-in-out infinite alternate;
+}
+
+.santa-arm-bottle {
+  transform-origin: 44px 94px;
+  animation: santa-swig 2.4s ease-in-out infinite alternate;
+}
+
+.santa-arm-grip {
+  transform-origin: 84px 94px;
+}
+
+.santa.is-shaking .santa-body {
+  animation: santa-shake 0.16s ease-in-out infinite alternate;
+}
+
+.santa.is-shaking .santa-arm-grip {
+  animation: santa-pull 0.16s ease-in-out infinite alternate;
+}
+
+@keyframes santa-sway {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes santa-head {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes santa-swig {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes santa-shake {
+  from {
+    transform: rotate(-2deg) translateX(-3px);
+  }
+  to {
+    transform: rotate(3deg) translateX(4px);
+  }
+}
+
+@keyframes santa-pull {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+.santa-hic {
+  font: 700 17px var(--font-display);
+  fill: #fff;
+  stroke: #7a1010;
+  stroke-width: 3px;
+  paint-order: stroke;
+  opacity: 0;
+  animation: santa-hic 3.4s ease-out 0.6s infinite;
+}
+
+@keyframes santa-hic {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  62%,
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* ───────── Мафія: розстріл підозрюваних ───────── */
+
+.lineup {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  padding: 22px 16px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 38px, rgba(255, 255, 255, 0.07) 38px 40px),
+    linear-gradient(#1d1a1a, #0d0c0c);
+}
+
+.lineup-smoke {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.65;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at 50% 60%, #000 20%, transparent 74%);
+}
+
+.lineup-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 150px));
+  justify-content: center;
+  gap: 18px 16px;
+  perspective: 1000px;
+}
+
+.suspect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.45s cubic-bezier(0.5, 0, 0.9, 0.4),
+    opacity 0.45s,
+    filter 0.45s;
+}
+
+.suspect-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 2px solid rgba(var(--accent-rgb), 0.45);
+  border-radius: 6px;
+  overflow: hidden;
+  container-type: inline-size;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.suspect-photo .avatar {
+  position: absolute;
+  inset: 0;
+}
+
+.suspect-name {
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.suspect.is-target {
+  z-index: 2;
+}
+
+.suspect.is-target .suspect-photo {
+  border-color: #ff3b3b;
+  animation: tremble 0.07s linear infinite alternate;
+}
+
+@keyframes tremble {
+  from {
+    transform: translateX(-1.5px) rotate(-0.6deg);
+  }
+  to {
+    transform: translateX(1.5px) rotate(0.6deg);
+  }
+}
+
+.crosshair {
+  position: absolute;
+  inset: 6%;
+  width: 88%;
+  height: 88%;
+  fill: none;
+  stroke: #ff3b3b;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.9));
+  animation: aim 0.35s ease-out both;
+  z-index: 2;
+}
+
+.crosshair-dot {
+  fill: #ff3b3b;
+}
+
+@keyframes aim {
+  from {
+    opacity: 0;
+    transform: scale(2.2) rotate(-90deg);
+  }
+}
+
+.suspect.is-shot {
+  transform: translateY(8px) rotateX(24deg) rotate(var(--tilt)) scale(0.94);
+}
+
+/* Only the photo and the name fade: the red stamp stays red. */
+.suspect.is-shot .avatar,
+.suspect.is-shot .suspect-name {
+  opacity: 0.45;
+  filter: grayscale(1);
+  transition:
+    opacity 0.45s,
+    filter 0.45s;
+}
+
+.suspect.is-shot .suspect-photo {
+  animation: hit 0.3s ease-out;
+}
+
+@keyframes hit {
+  30% {
+    transform: translate(4px, -3px) scale(0.96);
+  }
+}
+
+.bullet-hole {
+  position: absolute;
+  left: var(--hole-x);
+  top: var(--hole-y);
+  width: 18%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #000 0 28%, #3a3a3a 33%, rgba(60, 60, 60, 0.5) 45%, transparent 64%);
+  z-index: 2;
+}
+
+.suspect-stamp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #d4141c;
+  font-size: 62cqw;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  z-index: 3;
+  animation: stamp 0.3s ease-out 0.12s both;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+.muzzle-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 236, 170, 0.5), rgba(255, 120, 40, 0.18) 40%, transparent 70%);
+  animation: muzzle-flash 0.35s ease-out forwards;
+}
+
+@keyframes muzzle-flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.suspect.is-winner {
+  z-index: 3;
+  transform: scale(1.1);
+}
+
+.suspect.is-winner .suspect-photo {
+  border-color: var(--highlight);
+  animation: suspect-spotlight 1s ease-in-out infinite alternate;
+}
+
+@keyframes suspect-spotlight {
+  from {
+    box-shadow:
+      0 0 0 2px var(--highlight),
+      0 0 18px rgba(var(--highlight-rgb), 0.5);
+  }
+  to {
+    box-shadow:
+      0 0 0 3px var(--highlight),
+      0 0 44px rgba(var(--highlight-rgb), 0.95);
+  }
+}
+
+/* ───────── Дикий Захід: скачки ───────── */
+
+.race {
+  --horse-h: calc(var(--lane-h) * 0.88);
+  --horse-w: calc(var(--horse-h) * 170 / 116);
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border: 3px solid #5a3214;
+  border-radius: var(--radius);
+  overflow: clip;
+  background:
+    repeating-linear-gradient(100deg, transparent 0 22px, rgba(90, 50, 20, 0.06) 22px 24px),
+    linear-gradient(#e9c88f, #c99a5e);
+  box-shadow: inset 0 0 40px rgba(90, 50, 20, 0.35);
+}
+
+.race-heading {
+  display: flex;
+  flex: none;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  color: #5a3214;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.race-lanes {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+}
+
+.lane {
+  display: grid;
+  grid-template-columns: minmax(90px, 170px) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  height: var(--lane-h);
+  border-bottom: 2px dashed rgba(90, 50, 20, 0.35);
+  transition: background 0.4s;
+}
+
+.lane:last-child {
+  border-bottom: none;
+}
+
+.lane-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #3b2416;
+  font-weight: 700;
+}
+
+.lane-avatar {
+  flex: none;
+  width: min(40px, calc(var(--lane-h) - 12px));
+  height: min(40px, calc(var(--lane-h) - 12px));
+  border: 2px solid #5a3214;
+  border-radius: 50%;
+}
+
+.lane-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.7rem, calc(var(--lane-h) * 0.32), 1rem);
+}
+
+.lane-medal {
+  flex: none;
+  font-size: 0.9rem;
+}
+
+.lane-track {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+}
+
+/* The runners' strip starts one horse length in, so a horse at 0 % stands fully on the track. */
+.lane-run {
+  position: absolute;
+  inset: 0 10px 0 var(--horse-w);
+}
+
+.lane-run::after {
+  content: '';
+  position: absolute;
+  left: var(--finish);
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0 / 8px 8px;
+  opacity: 0.85;
+}
+
+.runner {
+  position: absolute;
+  bottom: 1px;
+  width: var(--horse-w);
+  height: var(--horse-h);
+  transform: translateX(-100%);
+  transition: left var(--travel) linear;
+  z-index: 1;
+}
+
+.horse-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 85% 100%;
+  filter: drop-shadow(0 3px 2px rgba(60, 30, 10, 0.35));
+}
+
+.horse-svg g {
+  transform-box: view-box;
+}
+
+.horse-body {
+  animation: horse-bob var(--gallop) ease-in-out infinite;
+  transform-origin: 90px 75px;
+}
+
+.horse-leg {
+  transform-origin: 0px 0px;
+  animation: horse-gallop-back var(--gallop) ease-in-out infinite;
+}
+
+.horse-front {
+  animation-name: horse-gallop-front;
+}
+
+.horse-knee {
+  transform-origin: 0px 0px;
+  animation: horse-knee var(--gallop) ease-in-out infinite;
+}
+
+.horse-far,
+.horse-far .horse-knee {
+  animation-delay: calc(var(--gallop) * -0.45);
+}
+
+.horse-front .horse-knee {
+  animation-direction: reverse;
+}
+
+.horse-tail {
+  transform-box: view-box;
+  transform-origin: 44px 68px;
+  animation: horse-tail var(--gallop) ease-in-out infinite alternate;
+}
+
+@keyframes horse-bob {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  35% { transform: translateY(-3px) rotate(0.8deg); }
+  70% { transform: translateY(-1px) rotate(-0.4deg); }
+}
+
+@keyframes horse-gallop-back {
+  0%, 100% { transform: rotate(32deg); }
+  40% { transform: rotate(-38deg); }
+  70% { transform: rotate(-6deg); }
+}
+
+@keyframes horse-gallop-front {
+  0%, 100% { transform: rotate(-35deg); }
+  45% { transform: rotate(38deg); }
+  75% { transform: rotate(4deg); }
+}
+
+@keyframes horse-knee {
+  0%, 100% { transform: rotate(5deg); }
+  50% { transform: rotate(-58deg); }
+}
+
+@keyframes horse-tail {
+  to { transform: rotate(12deg); }
+}
+
+.lane.is-target .horse-svg {
+  animation: horse-wobble 0.14s ease-in-out infinite alternate;
+}
+
+@keyframes horse-wobble {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+.lane.is-fallen .runner {
+  transition-duration: 0.6s;
+  transition-timing-function: ease-out;
+}
+
+.lane.is-fallen .horse-svg {
+  animation: horse-stumble min(0.6s, calc(var(--step) * 0.55)) ease-in forwards;
+}
+
+.lane.is-fallen .horse-svg * {
+  animation: none;
+}
+
+.lane.is-fallen .horse-front { transform: rotate(-18deg); }
+.lane.is-fallen .horse-front .horse-knee { transform: rotate(-48deg); }
+.lane.is-fallen .horse-back { transform: rotate(12deg); }
+
+@keyframes horse-stumble {
+  35% {
+    transform: rotate(12deg) translateY(2%);
+  }
+  100% {
+    transform: rotate(7deg) translateY(3%);
+    filter: grayscale(0.6) opacity(0.6);
+  }
+}
+
+.lane.is-fallen .lane-label {
+  opacity: 0.5;
+}
+
+.lane.is-fallen .lane-name {
+  text-decoration: line-through;
+}
+
+.runner-dust {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(160, 110, 60, 0.6), rgba(160, 110, 60, 0.2) 50%, transparent 70%);
+  pointer-events: none;
+  animation: race-dust 0.9s ease-out forwards;
+}
+
+@keyframes race-dust {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30%, -20%) scale(1.8, 1.3);
+  }
+}
+
+.lane.is-winner {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.45), rgba(255, 215, 0, 0.08));
+}
+
+.lane.is-winner .runner {
+  transition: left 1.2s cubic-bezier(0.3, 0.6, 0.4, 1);
+}
+
+.lane.is-winner .lane-avatar {
+  border-color: #b8860b;
+  box-shadow: 0 0 12px rgba(255, 200, 0, 0.9);
+}
+
+/* ───────── Український: гопак до упаду ───────── */
+
+.hopak-floor {
+  width: 100%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 130px));
+  justify-content: center;
+  gap: 18px 12px;
+  padding: 16px 8px;
+  border-radius: var(--radius);
+  background: radial-gradient(ellipse at 50% 100%, rgba(255, 210, 63, 0.2), transparent 70%);
+}
+
+.hopak-dancer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  transition:
+    opacity 0.5s,
+    filter 0.5s;
+}
+
+.hopak-figure {
+  position: relative;
+  width: 78%;
+  isolation: isolate;
+}
+
+.hopak-performer {
+  position: relative;
+  transform-origin: 50% 100%;
+}
+
+.hopak-figure .dancer-svg {
+  filter: drop-shadow(0 6px 5px rgba(0, 0, 0, 0.3));
+}
+
+/* Everyone dances out of step */
+.hopak-dancer .dancer-svg g {
+  animation-delay: var(--lag);
+}
+
+/* Running out of steam: the dance itself slows down (see HopakScene), the whole figure sways.
+   The sway starts from the upright pose, so nothing jumps. */
+.hopak-dancer.is-target .hopak-performer {
+  animation: hopak-stagger 1.1s ease-in-out infinite;
+}
+
+@keyframes hopak-stagger {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  30% { transform: translate(0, 2%) rotate(calc(var(--dir) * -5deg)) scale(1, 0.97); }
+  70% { transform: translate(0, 3%) rotate(calc(var(--dir) * 4deg)) scale(1, 0.95); }
+}
+
+.hopak-sweat {
+  position: absolute;
+  right: 4%;
+  top: 4%;
+  font-size: 1.3rem;
+  animation: sweat-drip 0.6s ease-in infinite;
+}
+
+@keyframes sweat-drip {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+/* Worn out: the knees give, a last stagger, then down on one side with a little bounce.
+   --dir picks the side. */
+.hopak-dancer.is-fallen .hopak-performer {
+  transform: translate(calc(var(--dir) * -45%), -13%) rotate(calc(var(--dir) * 90deg)) scale(0.7, 0.7);
+  animation: hopak-collapse min(0.95s, calc(var(--step) * 0.7)) both;
+}
+
+@keyframes hopak-collapse {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1, 1);
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  22% {
+    transform: translate(0, 5%) rotate(calc(var(--dir) * -6deg)) scale(1, 0.88);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  42% {
+    transform: translate(calc(var(--dir) * -6%), 6%) rotate(calc(var(--dir) * 12deg)) scale(0.96, 0.84);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
+  }
+  78% {
+    transform: translate(calc(var(--dir) * -45%), -13%) rotate(calc(var(--dir) * 94deg)) scale(0.7, 0.7);
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  90% {
+    transform: translate(calc(var(--dir) * -45%), -16%) rotate(calc(var(--dir) * 87deg)) scale(0.7, 0.7);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  100% {
+    transform: translate(calc(var(--dir) * -45%), -13%) rotate(calc(var(--dir) * 90deg)) scale(0.7, 0.7);
+  }
+}
+
+/* The limbs go limp: the dance stops and every joint eases from wherever it was into a slack pose
+   (removing an animation starts a transition from its last value). */
+.hopak-dancer.is-fallen .dancer-svg g {
+  animation: none;
+  transition: transform 0.5s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.3s;
+}
+
+.hopak-dancer.is-fallen .cossack-body { transform: translateY(10px); }
+.hopak-dancer.is-fallen .leg-front { transform: rotate(14deg); }
+.hopak-dancer.is-fallen .leg-back { transform: rotate(-8deg); }
+.hopak-dancer.is-fallen .shin-front { transform: rotate(-22deg); }
+.hopak-dancer.is-fallen .shin-back { transform: rotate(14deg); }
+.hopak-dancer.is-fallen .arm-front { transform: rotate(28deg); }
+.hopak-dancer.is-fallen .arm-back { transform: rotate(-42deg); }
+.hopak-dancer.is-fallen .cossack-torso { transform: rotate(3deg); }
+.hopak-dancer.is-fallen .cossack-head { transform: rotate(16deg); }
+.hopak-dancer.is-fallen .cossack-forelock { transform: rotate(28deg); }
+.hopak-dancer.is-fallen .cossack-sash { transform: rotate(24deg); }
+.hopak-dancer.is-fallen .cossack-shadow { transform: scale(0.4); opacity: 0; }
+
+.hopak-dancer.is-fallen {
+  filter: grayscale(0.6);
+  opacity: 0.6;
+  transition-delay: 0.4s;
+}
+
+/* Stars over the head, once the dancer is down */
+.hopak-dizzy {
+  position: absolute;
+  left: calc(50% + var(--dir) * 30%);
+  bottom: 16%;
+  font-size: 1.4rem;
+  transform: translateX(-50%);
+  animation:
+    dizzy-in 0.3s ease-out min(0.75s, calc(var(--step) * 0.55)) both,
+    dizzy 1s ease-in-out 1s infinite alternate;
+}
+
+@keyframes dizzy-in {
+  from {
+    transform: translateX(-50%) scale(0) rotate(-90deg);
+  }
+}
+
+@keyframes dizzy {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hopak-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 2px 8px 2px 2px;
+  border-radius: 99px;
+  background: rgba(var(--surface-rgb), 0.12);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.hopak-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hopak-avatar {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.hopak-dancer.is-fallen .hopak-name span {
+  text-decoration: line-through;
+}
+
+.scene-hopak.is-done .hopak-dancer:not(.is-winner) {
+  opacity: 0.35;
+}
+
+.hopak-dancer.is-winner .hopak-performer {
+  animation: hopak-winner 1.2s ease-in-out infinite alternate;
+}
+
+.hopak-dancer.is-winner .hopak-figure::before {
+  content: '';
+  position: absolute;
+  inset: -15% -18% -2%;
+  z-index: -1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg at 50% 70%, #ffd23f55 0deg 12deg, transparent 12deg 28deg);
+  mask-image: radial-gradient(ellipse, #000 20%, transparent 70%);
+}
+
+.hopak-dancer.is-winner .hopak-name {
+  border-color: var(--highlight);
+  box-shadow: 0 0 16px rgba(var(--highlight-rgb), 0.8);
+}
+
+/* The dance already jumps: the winner just grows a little, from the feet up */
+@keyframes hopak-winner {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+/* ───────── Вузькі екрани ───────── */
+
+@media (max-width: 600px) {
+  .lineup {
+    padding: 14px 8px 18px;
+  }
+
+  .lineup-grid {
+    grid-template-columns: repeat(var(--cols-small), minmax(0, 150px));
+    gap: 12px 8px;
+  }
+
+  .suspect-name,
+  .hopak-name {
+    font-size: 0.72rem;
+  }
+
+  .lane {
+    grid-template-columns: minmax(65px, 90px) minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .hopak-floor {
+    grid-template-columns: repeat(var(--cols-small), minmax(0, 130px));
+    gap: 12px 6px;
+    padding: 10px 4px;
+  }
+
+  .hopak-avatar {
+    width: 16px;
+    height: 16px;
+  }
+
+  .race {
+    --horse-h: min(52px, calc(var(--lane-h) * 0.88));
+    padding: 10px 8px;
+  }
+
+  .race-heading { font-size: 0.6rem; letter-spacing: 0.03em; }
+
+  .lane-label { gap: 4px; }
+  .lane-avatar { width: 24px; height: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .scene *,
+  .scene *::before,
+  .scene *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
