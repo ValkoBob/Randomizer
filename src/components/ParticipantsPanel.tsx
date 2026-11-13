@@ -1,14 +1,21 @@
 import { useEffect, type FocusEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import type { Participant, WinnerRecord } from '../participants/types';
+import type { Participant, ParticipantMode, WinnerRecord } from '../participants/types';
+import type { AddNamesResult } from '../participants/useNameParticipants';
 import type { AddFilesResult } from '../participants/useParticipants';
+import { ModeSwitch } from './ModeSwitch';
+import { Monogram } from './Monogram';
+import { NamePicker } from './NamePicker';
 import { PhotoPicker } from './PhotoPicker';
 
 type ParticipantsPanelProps = {
   open: boolean;
   onClose: () => void;
+  mode: ParticipantMode;
+  onModeChange: (mode: ParticipantMode) => void;
   participants: Participant[];
   onAddFiles: (files: File[]) => Promise<AddFilesResult>;
+  onAddNames: (names: string[]) => AddNamesResult;
   onRename: (id: string, name: string) => void;
   onRemove: (id: string) => void;
   onClear: () => void;
@@ -21,8 +28,11 @@ type ParticipantsPanelProps = {
 export function ParticipantsPanel({
   open,
   onClose,
+  mode,
+  onModeChange,
   participants,
   onAddFiles,
+  onAddNames,
   onRename,
   onRemove,
   onClear,
@@ -81,13 +91,14 @@ export function ParticipantsPanel({
             </div>
 
             <div className="panel-picker">
-              <PhotoPicker onAddFiles={onAddFiles} />
+              <ModeSwitch mode={mode} onChange={onModeChange} />
+              {mode === 'photos' ? <PhotoPicker onAddFiles={onAddFiles} /> : <NamePicker onAddNames={onAddNames} />}
             </div>
 
             <ul className="participant-list">
               {participants.map((p) => (
                 <li key={p.id}>
-                  <img src={p.src} alt="" />
+                  {p.src ? <img src={p.src} alt="" /> : <Monogram name={p.name} />}
                   <input
                     key={p.name}
                     className="participant-name"

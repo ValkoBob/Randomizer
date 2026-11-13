@@ -2,19 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { AnimatePresence, useReducedMotion, type TargetAndTransition, type Transition } from 'motion/react';
 import type { Participant } from '../participants/types';
 import { buildScanSchedule, interleave, randomInt, riffleCut } from '../random';
+import { useTheme } from '../themes/ThemeContext';
+import type { LabelledPhase } from '../themes/themes';
 import { Card } from './Card';
+import { ShuffleFx } from './ShuffleFx';
 import { WinnerOverlay } from './WinnerOverlay';
 
-type Phase = 'idle' | 'flipDown' | 'gather' | 'shuffle' | 'deal' | 'scan' | 'reveal' | 'result';
-
-const PHASE_LABELS: Partial<Record<Phase, string>> = {
-  flipDown: 'Перевертаємо картки…',
-  gather: 'Збираємо колоду…',
-  shuffle: 'Тасуємо…',
-  deal: 'Роздаємо…',
-  scan: 'Хто ж це буде?..',
-  reveal: 'Є!',
-};
+type Phase = 'idle' | LabelledPhase | 'result';
 
 const SHUFFLE_PASSES = 3;
 const EASE: [number, number, number, number] = [0.3, 0.7, 0.2, 1];
@@ -41,6 +35,7 @@ type TableProps = {
 };
 
 export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinners }: TableProps) {
+  const theme = useTheme();
   const [phase, setPhase] = useState<Phase>('idle');
   const [order, setOrder] = useState<string[]>(() => pool.map((p) => p.id));
   const [faceDown, setFaceDown] = useState(false);
@@ -178,7 +173,7 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
 
   const isDeck = phase === 'gather' || phase === 'shuffle';
   const winner = winnerId ? byId.get(winnerId) : undefined;
-  const status = PHASE_LABELS[phase];
+  const status = phase === 'idle' || phase === 'result' ? undefined : theme.phaseLabels[phase];
 
   const tableStyle = {
     '--cols': columnsFor(cards.length),
@@ -229,13 +224,13 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
     <section className="stage">
       <div className="controls">
         <button type="button" className="btn-primary" onClick={startRound} disabled={phase !== 'idle' || cards.length === 0}>
-          🎃 Тасувати!
+          {theme.shuffleButton}
         </button>
         <div className="status" aria-live="polite">
           {status ??
             (cards.length === 0
               ? allExcluded
-                ? 'Усі вже виграли 🎉'
+                ? theme.allWonText
                 : 'Додайте учасників, щоб почати'
               : `${cards.length} у грі`)}
           {phase === 'idle' && allExcluded && (
@@ -265,6 +260,7 @@ export function Table({ pool, allExcluded, onRoundEnd, onBusyChange, onResetWinn
             />
           );
         })}
+        <AnimatePresence>{isDeck && theme.shuffleFx && !reducedMotion && <ShuffleFx key="fx" kind={theme.shuffleFx} />}</AnimatePresence>
       </div>
 
       <AnimatePresence>

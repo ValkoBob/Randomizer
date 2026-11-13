@@ -1,17 +1,44 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ModeSwitch } from './components/ModeSwitch';
+import { NamePicker } from './components/NamePicker';
 import { ParticipantsPanel } from './components/ParticipantsPanel';
 import { PhotoPicker } from './components/PhotoPicker';
 import { Table } from './components/Table';
-import type { Participant, WinnerRecord } from './participants/types';
+import { ThemePicker } from './components/ThemePicker';
+import type { Participant, ParticipantMode, WinnerRecord } from './participants/types';
+import { useNameParticipants } from './participants/useNameParticipants';
 import { useParticipants } from './participants/useParticipants';
 import { usePersistentState } from './participants/usePersistentState';
+import { ThemeContext } from './themes/ThemeContext';
+import { getTheme, seasonalTheme, type ThemeId } from './themes/themes';
+
+function setFavicon(emoji: string) {
+  const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+  if (!link) return;
+  link.href = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${emoji}</text></svg>`;
+}
 
 export function App() {
-  const { participants, loaded, addFiles, rename, remove, clear } = useParticipants();
+  const photos = useParticipants();
+  const names = useNameParticipants();
+  const [mode, setMode, modeLoaded] = usePersistentState<ParticipantMode>('participantMode', 'photos');
+  const active = mode === 'photos' ? photos : names;
+  const participants: Participant[] = active.participants;
   const [winners, setWinners, winnersLoaded] = usePersistentState<WinnerRecord[]>('winners', []);
   const [excludeWinners, setExcludeWinners, excludeLoaded] = usePersistentState('excludeWinners', false);
+  // null = the user never picked a theme, so it follows the season.
+  const [storedTheme, setStoredTheme, themeLoaded] = usePersistentState<ThemeId | null>('theme', null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  const theme = useMemo(() => getTheme(storedTheme ?? seasonalTheme(new Date())), [storedTheme]);
+
+  useEffect(() => {
+    if (!themeLoaded) return;
+    document.documentElement.dataset.theme = theme.id;
+    document.title = theme.title;
+    setFavicon(theme.icon);
+  }, [theme, themeLoaded]);
 
   const pool = useMemo(() => {
     if (!excludeWinners) return participants;
@@ -26,52 +53,71 @@ export function App() {
   const clearWinners = useCallback(() => setWinners([]), [setWinners]);
   const closePanel = useCallback(() => setPanelOpen(false), []);
 
-  if (!loaded || !winnersLoaded || !excludeLoaded) {
-    return <div className="loading">🎃</div>;
+  if (!photos.loaded || !names.loaded || !modeLoaded || !winnersLoaded || !excludeLoaded || !themeLoaded) {
+    return <div className="loading">🎲</div>;
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div>
-          <h1>Halloween Randomizer</h1>
-          <p className="subtitle">Тасуємо колоду — і доля обирає одного 🦇</p>
-        </div>
-        <button type="button" className="btn-secondary" onClick={() => setPanelOpen(true)} disabled={busy}>
-          👥 Учасники · {participants.length}
-        </button>
-      </header>
+    <ThemeContext.Provider value={theme}>
+      <div className="app">
+        <header className="header">
+          <div>
+            <h1>{theme.title}</h1>
+            <p className="subtitle">{theme.subtitle}</p>
+          </div>
+          <div className="header-actions">
+            <ThemePicker onChange={setStoredTheme} disabled={busy} />
+            <button type="button" className="btn-secondary" onClick={() => setPanelOpen(true)} disabled={busy}>
+              👥 Учасники · {participants.length}
+            </button>
+          </div>
+        </header>
 
-      {participants.length === 0 ? (
-        <section className="empty-state">
-          <div className="empty-state-icon">🎃</div>
-          <h2>Додайте фото учасників</h2>
-          <p className="muted">Виберіть фото на комп&apos;ютері — по одному чи кілька, або цілу папку.</p>
-          <PhotoPicker onAddFiles={addFiles} />
-        </section>
-      ) : (
-        <Table
-          pool={pool}
-          allExcluded={pool.length === 0}
-          onRoundEnd={handleRoundEnd}
-          onBusyChange={setBusy}
-          onResetWinners={clearWinners}
+        {participants.length === 0 ? (
+          <section className="empty-state">
+            <div className="empty-state-icon">{theme.emptyIcon}</div>
+            <ModeSwitch mode={mode} onChange={setMode} />
+            {mode === 'photos' ? (
+              <>
+                <h2>Додайте фото учасників</h2>
+                <p className="muted">Виберіть фото на комп&apos;ютері — по одному чи кілька, або цілу папку.</p>
+                <PhotoPicker onAddFiles={photos.addFiles} />
+              </>
+            ) : (
+              <>
+                <h2>Впишіть імена учасників</h2>
+                <p className="muted">Без фото — на картках будуть ініціали. Список можна завантажити з файлу.</p>
+                <NamePicker onAddNames={names.addNames} />
+              </>
+            )}
+          </section>
+        ) : (
+          <Table
+            pool={pool}
+            allExcluded={pool.length === 0}
+            onRoundEnd={handleRoundEnd}
+            onBusyChange={setBusy}
+            onResetWinners={clearWinners}
+          />
+        )}
+
+        <ParticipantsPanel
+          open={panelOpen && !busy}
+          onClose={closePanel}
+          mode={mode}
+          onModeChange={setMode}
+          participants={participants}
+          onAddFiles={photos.addFiles}
+          onAddNames={names.addNames}
+          onRename={active.rename}
+          onRemove={active.remove}
+          onClear={active.clear}
+          excludeWinners={excludeWinners}
+          onExcludeWinnersChange={setExcludeWinners}
+          winners={winners}
+          onClearWinners={clearWinners}
         />
-      )}
-
-      <ParticipantsPanel
-        open={panelOpen && !busy}
-        onClose={closePanel}
-        participants={participants}
-        onAddFiles={addFiles}
-        onRename={rename}
-        onRemove={remove}
-        onClear={clear}
-        excludeWinners={excludeWinners}
-        onExcludeWinnersChange={setExcludeWinners}
-        winners={winners}
-        onClearWinners={clearWinners}
-      />
-    </div>
+      </div>
+    </ThemeContext.Provider>
   );
 }

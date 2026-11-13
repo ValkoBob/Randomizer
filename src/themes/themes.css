@@ -1,0 +1,861 @@
+/*
+ * Theme overrides. <html data-theme="…"> is set by App; Halloween uses the defaults from styles.css.
+ * Shared tokens are documented at the top of styles.css.
+ */
+
+:root:not([data-theme='halloween']) .overlay-content h2 {
+  font-family: var(--font-display);
+  font-weight: var(--title-weight);
+  letter-spacing: 1px;
+}
+
+/* ───────────── Мафія: нуар, кров'яно-червоний, слонова кістка ───────────── */
+
+[data-theme='mafia'] {
+  --bg: #0b0a0b;
+  --bg-raised: #171214;
+  --bg-input: #251b1e;
+  --accent: #c0141e;
+  --accent-rgb: 192, 20, 30;
+  --accent-light: #e8c26a;
+  --accent-light-rgb: 232, 194, 106;
+  --highlight: #f0d080;
+  --highlight-rgb: 240, 208, 128;
+  --secondary-rgb: 140, 20, 30;
+  --text: #f3ead8;
+  --muted: #a99f8d;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --title-weight: 900;
+  --title-spacing: 0.5px;
+  --title-color: #f3ead8;
+  --title-shadow:
+    0 2px 0 #6d0a10,
+    0 0 24px rgba(192, 20, 30, 0.55);
+
+  --body-bg:
+    radial-gradient(ellipse 50% 60% at 50% -5%, rgba(255, 235, 200, 0.1), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(120, 10, 18, 0.35), transparent 70%),
+    radial-gradient(circle at 50% 45%, transparent 45%, rgba(0, 0, 0, 0.75) 100%),
+    var(--bg);
+
+  --btn-primary-text: #fff6e6;
+  --btn-primary-bg: linear-gradient(180deg, #e3262f, #8f0d15);
+
+  --card-front-border: rgba(232, 194, 106, 0.55);
+  --card-name-color: #e8c26a;
+  --card-name-bg: linear-gradient(180deg, #1f1618, #0e0a0b);
+  --card-back-border: #8f0d15;
+  --card-back-inner-border: 1px solid rgba(232, 194, 106, 0.6);
+  --card-back-bg:
+    radial-gradient(circle at 50% 50%, rgba(192, 20, 30, 0.45), transparent 50%),
+    repeating-linear-gradient(45deg, #1d0b0e 0 9px, #0e0607 9px 18px);
+
+  --overlay-bg: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme='mafia'] .card-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+}
+
+[data-theme='mafia'] .card-back::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(232, 194, 106, 0.3);
+  border-radius: 6px;
+}
+
+/* ───────────── Новий рік / Різдво: ялинка, карамель, сніг ───────────── */
+
+[data-theme='newyear'] {
+  --bg: #06160f;
+  --bg-raised: #0d2419;
+  --bg-input: #143323;
+  --accent: #e0303a;
+  --accent-rgb: 224, 48, 58;
+  --accent-light: #f5c542;
+  --accent-light-rgb: 245, 197, 66;
+  --highlight: #ffe08a;
+  --highlight-rgb: 255, 224, 138;
+  --secondary-rgb: 31, 138, 76;
+  --text: #f4fbf6;
+  --muted: #a9c9b6;
+
+  --font-display: 'Lobster', 'Nunito', cursive;
+  --title-weight: 400;
+  --title-spacing: 1px;
+  --title-color: #ffffff;
+  --title-shadow:
+    0 0 10px rgba(245, 197, 66, 0.7),
+    0 0 32px rgba(224, 48, 58, 0.5);
+
+  --body-bg:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(31, 138, 76, 0.4), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(224, 48, 58, 0.15), transparent 70%),
+    var(--bg);
+
+  --btn-primary-text: #ffffff;
+  --btn-primary-bg: linear-gradient(180deg, #ff5a5f, #c41e2a);
+
+  --card-front-border: rgba(245, 197, 66, 0.6);
+  --card-name-color: #f5c542;
+  --card-name-bg: linear-gradient(180deg, #13402a, #0a2216);
+  --card-back-border: #f5c542;
+  --card-back-inner-border: 1px dashed rgba(255, 255, 255, 0.75);
+  --card-back-bg:
+    radial-gradient(circle at 50% 50%, #0f4a2c 0 30%, #f5c542 30.5% 33%, transparent 33.5%),
+    repeating-linear-gradient(45deg, #c41e2a 0 12px, #f8f4ec 12px 24px);
+
+  --overlay-bg: rgba(2, 12, 8, 0.82);
+}
+
+[data-theme='newyear'] .card-back-icon {
+  filter: drop-shadow(0 0 10px rgba(245, 197, 66, 0.8));
+}
+
+/* Snowfall: two layers of dots drifting at different speeds behind the app. */
+[data-theme='newyear'] body::before,
+[data-theme='newyear'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20px 30px, #fff 0 2px, transparent 2.5px),
+    radial-gradient(circle at 90px 110px, rgba(255, 255, 255, 0.85) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 150px 60px, rgba(255, 255, 255, 0.7) 0 2.5px, transparent 3px),
+    radial-gradient(circle at 60px 170px, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 180px 190px, #fff 0 2px, transparent 2.5px);
+  background-size: 200px 200px;
+  animation: snowfall 14s linear infinite;
+  opacity: 0.55;
+}
+
+[data-theme='newyear'] body::after {
+  background-size: 320px 320px;
+  animation-duration: 24s;
+  opacity: 0.35;
+}
+
+@keyframes snowfall {
+  to {
+    background-position: 60px 640px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='newyear'] body::before,
+  [data-theme='newyear'] body::after {
+    animation: none;
+  }
+}
+
+/* ───────────── Середньовіччя: пергамент, тайли земель, геральдика ───────────── */
+
+[data-theme='medieval'] {
+  --bg: #efe2c4;
+  --bg-raised: #f8eed6;
+  --bg-input: #fff8e6;
+  --accent: #9e2a2b;
+  --accent-rgb: 158, 42, 43;
+  --accent-light: #7a4f1d;
+  --accent-light-rgb: 122, 79, 29;
+  --highlight: #d9a531;
+  --highlight-rgb: 217, 165, 49;
+  --secondary-rgb: 79, 122, 42;
+  --surface-rgb: 60, 40, 20;
+  --text: #33240f;
+  --muted: #6e5a3e;
+  --border: rgba(122, 79, 29, 0.35);
+
+  --font-display: 'Cormorant SC', Georgia, serif;
+  --title-weight: 700;
+  --title-spacing: 1px;
+  --title-color: #7a1f1f;
+  --title-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7),
+    0 3px 8px rgba(80, 50, 20, 0.25);
+
+  --body-bg:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255, 251, 238, 0.95), transparent 70%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(120, 80, 30, 0.3) 100%),
+    var(--bg);
+
+  --btn-primary-text: #fff8e8;
+  --btn-primary-bg: linear-gradient(180deg, #bb3b3c, #7f1d1e);
+
+  --card-front-border: #6b4a1f;
+  --card-name-color: #33240f;
+  --card-name-bg: linear-gradient(180deg, #f8eed6, #e4d0a2);
+  --card-back-border: #5a3e1b;
+  --card-back-inner-border: 1px solid rgba(255, 248, 230, 0.55);
+  /* A land tile: city with a wall on top, a road running down, fields around. */
+  --card-back-bg:
+    linear-gradient(180deg, #c9a46a 0 24%, #7d5a2c 24% 27%, transparent 27%),
+    linear-gradient(90deg, transparent 43%, #6d5a3a 43% 44%, #eadcb4 44% 56%, #6d5a3a 56% 57%, transparent 57%),
+    repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0 6px, transparent 6px 12px),
+    #6f9a3c;
+
+  --overlay-bg: rgba(45, 28, 10, 0.72);
+  color-scheme: light;
+}
+
+[data-theme='medieval'] .card-face {
+  box-shadow: 0 8px 18px rgba(80, 50, 20, 0.35);
+}
+
+[data-theme='medieval'] .card-name {
+  font-family: 'Cormorant SC', Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+}
+
+[data-theme='medieval'] .card-back-icon {
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+}
+
+[data-theme='medieval'] .overlay-content h2 {
+  color: #ffe7a8;
+}
+
+[data-theme='medieval'] .theme-menu {
+  box-shadow: 0 14px 30px rgba(80, 50, 20, 0.3);
+}
+
+[data-theme='medieval'] .panel {
+  box-shadow: -10px 0 30px rgba(80, 50, 20, 0.3);
+}
+
+[data-theme='medieval'] .panel-backdrop {
+  background: rgba(45, 28, 10, 0.4);
+}
+
+/* ───────────── Дикий Захід: дерево салуну, шкіра, плакат «Розшукується» ───────────── */
+
+[data-theme='wildwest'] {
+  --bg: #1c120b;
+  --bg-raised: #2a1b10;
+  --bg-input: #3a2616;
+  --accent: #c8742f;
+  --accent-rgb: 200, 116, 47;
+  --accent-light: #e9c27a;
+  --accent-light-rgb: 233, 194, 122;
+  --highlight: #f2c14e;
+  --highlight-rgb: 242, 193, 78;
+  --secondary-rgb: 140, 86, 42;
+  --text: #f4e2b8;
+  --muted: #c2a57a;
+
+  --font-display: 'Kelly Slab', Georgia, serif;
+  --title-weight: 400;
+  --title-spacing: 4px;
+  --title-color: #f2c14e;
+  --title-shadow:
+    2px 2px 0 #6b3a16,
+    4px 4px 0 rgba(0, 0, 0, 0.45);
+
+  --body-bg:
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(232, 140, 60, 0.25), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(180deg, #23160c 0 62px, #150d07 62px 65px),
+    var(--bg);
+
+  --btn-primary-text: #2a1405;
+  --btn-primary-bg: linear-gradient(180deg, #f0c57d, #c8742f);
+
+  --card-front-border: #7a4a24;
+  --card-name-color: #3b2410;
+  --card-name-bg: linear-gradient(180deg, #ecd8aa, #d4b47a);
+  --card-back-border: #3b2410;
+  --card-back-inner-border: 2px dashed rgba(233, 194, 122, 0.7);
+  --card-back-bg:
+    radial-gradient(circle at 50% 50%, rgba(242, 193, 78, 0.35), transparent 50%),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
+    linear-gradient(135deg, #7d4c25, #4a2a12);
+
+  --overlay-bg: rgba(15, 8, 3, 0.82);
+}
+
+[data-theme='wildwest'] .header h1 {
+  text-transform: uppercase;
+}
+
+[data-theme='wildwest'] .card-name {
+  font-family: 'Kelly Slab', Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* The winner card becomes a "Wanted" poster. */
+[data-theme='wildwest'] .card-large .card-front {
+  padding: 12px 12px 0;
+  border: 6px double #5a3214;
+  background: radial-gradient(circle at 50% 40%, #f1e0b8, #d9bb83);
+}
+
+[data-theme='wildwest'] .card-large .card-front img,
+[data-theme='wildwest'] .card-large .card-monogram {
+  width: 100%;
+  border: 2px solid #5a3214;
+  filter: sepia(0.65) contrast(1.05);
+}
+
+[data-theme='wildwest'] .card-large .card-name {
+  flex-direction: column;
+  gap: 2px;
+  background: transparent;
+}
+
+[data-theme='wildwest'] .card-large .card-name::after {
+  content: 'Нагорода — $1 000';
+  font-size: 0.55em;
+  letter-spacing: 2px;
+  color: #7a1f0f;
+}
+
+/* ───────────── Український: синьо-жовтий, вишиванка ───────────── */
+
+[data-theme='ukrainian'] {
+  --bg: #0a1a33;
+  --bg-raised: #102544;
+  --bg-input: #183257;
+  --accent: #ffd700;
+  --accent-rgb: 255, 215, 0;
+  --accent-light: #ffe066;
+  --accent-light-rgb: 255, 224, 102;
+  --highlight: #ffd700;
+  --highlight-rgb: 255, 215, 0;
+  --secondary-rgb: 0, 87, 183;
+  --text: #f5f7fb;
+  --muted: #a9bbd6;
+
+  --font-display: 'Ruslan Display', Georgia, serif;
+  --title-weight: 400;
+  --title-spacing: 1px;
+  --title-color: #ffd700;
+  --title-shadow:
+    0 3px 0 #0057b7,
+    0 0 22px rgba(255, 215, 0, 0.4);
+
+  --body-bg:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 87, 183, 0.5), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255, 215, 0, 0.12), transparent 70%),
+    var(--bg);
+
+  --btn-primary-text: #0a1a33;
+  --btn-primary-bg: linear-gradient(180deg, #ffe066, #ffc400);
+
+  --card-front-border: #c8102e;
+  --card-name-color: #1a1a1a;
+  --card-name-bg: #f4efe3;
+  --card-back-border: #c8102e;
+  --card-back-inner-border: 2px solid rgba(26, 26, 26, 0.85);
+  /* Cross-stitch: red diamond lattice on linen, a medallion in the middle, a faint stitch grid. */
+  --card-back-bg:
+    radial-gradient(circle at 50% 50%, #f4efe3 0 26%, #1a1a1a 26.5% 29%, transparent 29.5%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(45deg, transparent 0 13px, #c8102e 13px 17px),
+    repeating-linear-gradient(-45deg, transparent 0 13px, #c8102e 13px 17px),
+    #f4efe3;
+
+  --overlay-bg: rgba(3, 10, 24, 0.82);
+}
+
+/* Embroidered zigzag band (red on linen). */
+[data-theme='ukrainian'] .header::after,
+[data-theme='ukrainian'] .card-name::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background:
+    linear-gradient(135deg, #c8102e 25%, transparent 25%) -5px 0 / 10px 10px,
+    linear-gradient(225deg, #c8102e 25%, transparent 25%) -5px 0 / 10px 10px,
+    linear-gradient(315deg, #1a1a1a 25%, transparent 25%) 0 0 / 10px 10px,
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%) 0 0 / 10px 10px,
+    #f4efe3;
+}
+
+[data-theme='ukrainian'] .header {
+  padding-bottom: 22px;
+}
+
+[data-theme='ukrainian'] .header::after {
+  bottom: 0;
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+[data-theme='ukrainian'] .card-name {
+  padding-top: 14px;
+}
+
+[data-theme='ukrainian'] .card-name::before {
+  top: 0;
+  height: 8px;
+}
+
+[data-theme='ukrainian'] .card-back-icon {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* ───────────── Спецефекти під час тасування (src/components/ShuffleFx.tsx) ───────────── */
+
+.shuffle-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.fx-smoke,
+.fx-tumbleweed {
+  overflow: hidden;
+}
+
+/* Мафія: дим від сигар над столом */
+
+.fx-fog {
+  position: absolute;
+  inset: auto -10% 0;
+  height: 55%;
+  background:
+    radial-gradient(ellipse 45% 40% at 30% 60%, rgba(210, 210, 220, 0.28), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 70% 55%, rgba(210, 210, 220, 0.24), transparent 70%);
+  filter: blur(10px);
+  animation: fog-drift 3.6s ease-in-out infinite alternate;
+}
+
+.fx-puff {
+  position: absolute;
+  left: var(--x);
+  bottom: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 232, 238, 0.6) 0%, rgba(190, 190, 200, 0.28) 40%, transparent 70%);
+  filter: blur(7px);
+  opacity: 0;
+  animation: smoke-rise 3s ease-out var(--d) infinite;
+}
+
+.fx-puff.is-red {
+  background: radial-gradient(circle, rgba(220, 120, 120, 0.45) 0%, rgba(150, 40, 45, 0.22) 45%, transparent 70%);
+}
+
+@keyframes smoke-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.45) rotate(0deg);
+  }
+  25% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), -160px) scale(1.9) rotate(50deg);
+  }
+}
+
+@keyframes fog-drift {
+  from {
+    transform: translateX(-4%);
+  }
+  to {
+    transform: translateX(4%);
+  }
+}
+
+/* Дикий Захід: перекотиполе котиться повз колоду, з-під нього летить пилюка */
+
+.fx-dust-haze {
+  position: absolute;
+  inset: 30% -20% 0;
+  background:
+    radial-gradient(ellipse 40% 35% at 30% 55%, rgba(214, 170, 110, 0.5), transparent 70%),
+    radial-gradient(ellipse 35% 30% at 70% 50%, rgba(196, 148, 90, 0.4), transparent 70%);
+  filter: blur(8px);
+  animation: dust-haze 3.8s ease-in-out both;
+}
+
+@keyframes dust-haze {
+  0% {
+    opacity: 0;
+    transform: translateX(-12%);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+    transform: translateX(12%);
+  }
+}
+
+.tumbleweed-track {
+  --size: 120px;
+  position: absolute;
+  left: calc(-1 * var(--size));
+  bottom: calc(50% - var(--card-h, 240px) / 2 - 16px);
+  width: var(--size);
+  height: var(--size);
+  animation: tumbleweed-roll var(--roll) linear both;
+}
+
+.tumbleweed-bounce {
+  width: 100%;
+  height: 100%;
+  animation: tumbleweed-bounce var(--bounce) infinite;
+}
+
+.tumbleweed-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.35));
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes tumbleweed-roll {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes tumbleweed-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.06, 0.94);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  50% {
+    transform: translateY(-46px) scale(1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.3);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fx-dust-puff {
+  --size: 120px;
+  position: absolute;
+  left: calc(-1 * var(--size) + (100% + var(--size)) * var(--f) + var(--size) / 2);
+  bottom: calc(50% - var(--card-h, 240px) / 2 - 22px);
+  width: 90px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(222, 184, 135, 0.85), rgba(190, 140, 90, 0.35) 50%, transparent 72%);
+  filter: blur(3px);
+  animation: dust-puff 1.1s ease-out var(--d) both;
+}
+
+@keyframes dust-puff {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.3);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-80%, -18px) scale(2.2, 1.6);
+  }
+}
+
+/* Український: козак і козачка танцюють гопака обабіч колоди */
+
+.dancer {
+  --dancer-w: 132px;
+  position: absolute;
+  bottom: calc(50% - var(--card-h, 240px) / 2);
+  width: var(--dancer-w);
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.3));
+}
+
+.dancer-cossack {
+  left: calc(50% - var(--card-w, 180px) * 1.15 - var(--dancer-w));
+  animation: dancer-in-left 0.5s ease-out both;
+}
+
+.dancer-kozachka {
+  right: calc(50% - var(--card-w, 180px) * 1.15 - var(--dancer-w));
+  animation: dancer-in-right 0.5s ease-out both;
+}
+
+@keyframes dancer-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+}
+
+@keyframes dancer-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+.dancer-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.dancer-svg g {
+  transform-box: view-box;
+}
+
+/* Козак: присядка з викидом ноги → стрибок-розніжка, по черзі кожною ногою */
+
+.cossack-body {
+  transform-origin: 60px 193px;
+  animation: cossack-body 1.6s infinite;
+}
+
+.cossack-leg {
+  transform-origin: 60px 116px;
+}
+
+.leg-front {
+  animation: leg-front 1.6s infinite;
+}
+
+.leg-back {
+  animation: leg-back 1.6s infinite;
+}
+
+.cossack-arm.arm-front {
+  transform-origin: 52px 75px;
+  animation: cossack-arm-front 1.6s infinite;
+}
+
+.cossack-arm.arm-back {
+  transform-origin: 68px 75px;
+  animation: cossack-arm-back 1.6s infinite;
+}
+
+@keyframes cossack-body {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+  12%,
+  25%,
+  62%,
+  75% {
+    transform: translateY(22px);
+  }
+  37%,
+  87% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes leg-front {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
+  12%,
+  25% {
+    transform: rotate(-82deg) scaleY(1);
+  }
+  37% {
+    transform: rotate(-45deg) scaleY(1);
+  }
+  62%,
+  75% {
+    transform: rotate(0deg) scaleY(0.7);
+  }
+  87% {
+    transform: rotate(40deg) scaleY(1);
+  }
+}
+
+@keyframes leg-back {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
+  12%,
+  25% {
+    transform: rotate(0deg) scaleY(0.7);
+  }
+  37% {
+    transform: rotate(40deg) scaleY(1);
+  }
+  62%,
+  75% {
+    transform: rotate(-82deg) scaleY(1);
+  }
+  87% {
+    transform: rotate(-45deg) scaleY(1);
+  }
+}
+
+@keyframes cossack-arm-front {
+  0%,
+  50%,
+  100% {
+    transform: rotate(25deg);
+  }
+  12%,
+  25%,
+  62%,
+  75% {
+    transform: rotate(95deg);
+  }
+  37%,
+  87% {
+    transform: rotate(160deg);
+  }
+}
+
+@keyframes cossack-arm-back {
+  0%,
+  50%,
+  100% {
+    transform: rotate(-25deg);
+  }
+  12%,
+  25%,
+  62%,
+  75% {
+    transform: rotate(-95deg);
+  }
+  37%,
+  87% {
+    transform: rotate(-160deg);
+  }
+}
+
+/* Козачка: пританцьовує в такт, крутиться, спідниця й стрічки розвіваються */
+
+.kozachka-spin {
+  transform-origin: 60px 100px;
+  animation: kozachka-spin 3.2s ease-in-out infinite;
+}
+
+.kozachka-body {
+  transform-origin: 60px 193px;
+  animation: kozachka-hop 1.6s ease-in-out infinite;
+}
+
+.kozachka-skirt {
+  transform-origin: 60px 106px;
+  animation: skirt-flare 0.8s ease-in-out infinite alternate;
+}
+
+.kozachka-ribbons {
+  transform-origin: 66px 36px;
+  animation: ribbons 0.8s ease-in-out infinite alternate;
+}
+
+.kozachka-arm {
+  transform-origin: 50px 76px;
+  animation: kozachka-arm 0.8s ease-in-out infinite alternate;
+}
+
+.kozachka-body .boot {
+  transform-box: fill-box;
+  animation: boot-step 0.4s ease-in-out infinite alternate;
+}
+
+.kozachka-body .boot-b {
+  animation-delay: -0.4s;
+}
+
+@keyframes kozachka-spin {
+  0%,
+  30%,
+  70%,
+  100% {
+    transform: scaleX(1);
+  }
+  45%,
+  55% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes kozachka-hop {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(4px) rotate(-6deg);
+  }
+  37%,
+  87% {
+    transform: translateY(-14px) rotate(0deg);
+  }
+  70% {
+    transform: translateY(4px) rotate(6deg);
+  }
+}
+
+@keyframes skirt-flare {
+  from {
+    transform: skewX(-7deg) scaleX(1);
+  }
+  to {
+    transform: skewX(7deg) scaleX(1.12);
+  }
+}
+
+@keyframes ribbons {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes kozachka-arm {
+  from {
+    transform: rotate(120deg);
+  }
+  to {
+    transform: rotate(165deg);
+  }
+}
+
+@keyframes boot-step {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+/* On narrow screens there is no room beside the deck: the couple dances in the corners, smaller. */
+@media (max-width: 640px) {
+  .dancer {
+    --dancer-w: 84px;
+    bottom: 0;
+  }
+
+  .dancer-cossack {
+    left: 0;
+  }
+
+  .dancer-kozachka {
+    right: 0;
+  }
+}
